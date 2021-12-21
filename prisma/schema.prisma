@@ -31,29 +31,30 @@ model User {
 }
 
 model Enterprise {
-  id          Int       @id @default(autoincrement())
-  user        User?     @relation(fields: [userId], references: [id])
+  id          Int      @id @default(autoincrement())
+  user        User?    @relation(fields: [userId], references: [id])
   userId      Int?
-  description String?   @db.Text
-  imageUrl    String?   @db.VarChar(255)
-  imageKey    String?   @db.VarChar(255)
-  isActive    Boolean?  @default(true) @db.Bit(1)
+  name        String?  @db.VarChar(255)
+  description String?  @db.Text
+  imageUrl    String?  @db.VarChar(255)
+  imageKey    String?  @db.VarChar(255)
+  isActive    Boolean? @default(true) @db.Bit(1)
 
-  email       String?   @db.VarChar(255)
-  linkedin    String?   @db.VarChar(255)
-  facebook    String?   @db.VarChar(255)
-  twitter     String?   @db.VarChar(255)
-  youtube     String?   @db.VarChar(255)
-  instagram   String?   @db.VarChar(255)
-  webPage     String?   @db.VarChar(255)
-  
-  workers     Int?
-  state       Int?      @default(0)
-  score       Int?      @default(0)
-  counter     Int?      @default(0)
-  products    Product[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now())
+  email     String? @db.VarChar(255)
+  linkedin  String? @db.VarChar(255)
+  facebook  String? @db.VarChar(255)
+  twitter   String? @db.VarChar(255)
+  youtube   String? @db.VarChar(255)
+  instagram String? @db.VarChar(255)
+  webPage   String? @db.VarChar(255)
+
+  workers   Int?
+  state     Int?      @default(0)
+  score     Int?      @default(0)
+  counter   Int?      @default(0)
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
 }
 
 enum Role {

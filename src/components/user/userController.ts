@@ -92,3 +92,16 @@ export const update = async (
     return result(res, error.toString());
   }
 };
+
+export const getEnterprise = async (req: Request, res: Response): Promise<Response<IResult>> => {
+  try {
+      const id = Number(req.params.id);
+      const enterprise = await prisma.enterprise.findFirst({ where: { userId: id, isActive: true } });
+
+      if (!enterprise) throw errorDefault("You don't have an enterprise");
+
+      return result(res, enterprise);
+  } catch (error: any) {
+      return result(res, error.toString());
+  }
+}

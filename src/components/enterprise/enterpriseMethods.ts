@@ -1,5 +1,8 @@
-import { Enterprise } from "@prisma/client";
+import { Enterprise, Prisma, PrismaClient } from "@prisma/client";
+import { paginate } from "../../helpers/pagination";
 import { deleteFile, uploadManyFiles } from "../../services/images/Cloudinary";
+
+const prisma = new PrismaClient();
 
 export const imageEnterprise = async (enterprise: Enterprise, file?: Express.Multer.File) => {
     const { imageKey } = enterprise;
@@ -19,4 +22,22 @@ export const imageEnterprise = async (enterprise: Enterprise, file?: Express.Mul
 
     return enterprise;
 
+}
+
+export const searchEnterprises = async (enterprise: Enterprise, limit: number = 10, page: number = 0): Promise<Enterprise[]> => {
+    const {skip, take} = paginate(limit, page);
+    const enterprises = await prisma.enterprise.findMany({
+        where: {
+            ...enterprise,
+            name: {
+                contains: enterprise.name || ''
+            },
+            isActive: true
+        },
+        skip,
+        take
+        
+    });
+    
+    return enterprises;
 }
