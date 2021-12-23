@@ -26,7 +26,7 @@ export const store = async (req: Request, res: Response): Promise<Response<IResu
         return result(res, error.toString());
     }
 }
-
+//pass
 export const update = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
         const productReq = req.body as Product;
