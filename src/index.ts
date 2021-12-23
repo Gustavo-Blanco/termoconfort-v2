@@ -3,7 +3,6 @@ import cors from 'cors';
 import morgan from 'morgan'
 import api from './router/api'
 import { env } from "./env";
-import { PrismaClient } from "@prisma/client";
 
 const app = express();
 //Middlewares

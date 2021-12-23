@@ -1,7 +1,9 @@
 import { Enterprise, PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import { formatRequest } from "../../helpers/requestForm";
 import { errorDefault, IResult, result } from "../../response/default";
 import { imageEnterprise, searchEnterprises } from "./enterpriseMethods";
+import { IEnterpriseReq } from "./enterpriseStructure";
 
 const prisma = new PrismaClient();
 
@@ -16,10 +18,12 @@ export const all = async (req: Request, res: Response): Promise<Response<IResult
 
 export const store = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
-        const enterpriseReq = req.body as Enterprise;
+        const enterpriseReq = formatRequest(req.body) as Enterprise;
+        
         const data = await imageEnterprise(enterpriseReq, req.file);
-        const enterprises = await prisma.enterprise.create({ data });
-        return result(res, enterprises);
+        const enterprise = await prisma.enterprise.create({ data });
+        
+        return result(res, enterprise);
     } catch (error: any) {
         return result(res, error.toString());
     }

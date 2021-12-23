@@ -4,13 +4,15 @@ import { deleteFile, uploadManyFiles } from "../../services/images/Cloudinary";
 
 const prisma = new PrismaClient();
 
-export const imageEnterprise = async (enterprise: Enterprise, file?: Express.Multer.File) => {
+export const imageEnterprise = async (enterprise: Enterprise, file?: Express.Multer.File): Promise<Enterprise> => {
     const { imageKey } = enterprise;
     
     if (imageKey) {
         await deleteFile(imageKey);
         enterprise.imageKey = null;
     }
+
+    // if (!file) delete enterprise.image?;
 
     if (file) {
         const images = await uploadManyFiles([file], 'ENTERPRISE');
