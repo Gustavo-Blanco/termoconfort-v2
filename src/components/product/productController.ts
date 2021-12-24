@@ -1,7 +1,7 @@
 import { PrismaClient, Product } from "@prisma/client";
 import { IResult, result } from "../../response/default";
 import { Request, Response } from 'express'
-import { deleteImages, saveProduct, searchProducts, updateProduct } from "./productMethods";
+import { saveProduct, searchProducts, updateProduct } from "./productMethods";
 import { formatRequest } from "../../helpers/requestForm";
 
 const prisma = new PrismaClient();
@@ -61,6 +61,20 @@ export const images = async (req: Request, res: Response): Promise<Response<IRes
         
         
         return result(res, await prisma.image.findMany());
+    } catch (error: any) {
+        return result(res, error.toString(), false);
+    }
+}
+
+
+export const deactive = async (req: Request, res: Response): Promise<Response<IResult>> => {
+    try {
+        const id = Number(req.params.id);
+        const enterprise = await prisma.product.update({
+            where: { id },
+            data: { isActive: false }
+        });
+        return result(res, enterprise);
     } catch (error: any) {
         return result(res, error.toString(), false);
     }
