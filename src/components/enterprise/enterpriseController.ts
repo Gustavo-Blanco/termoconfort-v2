@@ -46,7 +46,6 @@ export const update = async (req: Request, res: Response): Promise<Response<IRes
     try {
         const enterpriseReq =  formartReqUpdate(formatRequest(req.body)) as Enterprise;
         const id = Number(req.params.id);
-
         const data = await imageEnterprise(enterpriseReq, req.file);
         const enterprises = await prisma.enterprise.update({ where: { id }, data });
 

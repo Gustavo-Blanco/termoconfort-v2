@@ -14,9 +14,6 @@ export const imageEnterprise = async (enterprise: Enterprise, file?: Express.Mul
         enterprise.imageKey = null;
     }
     
-    // console.log(enterprise, 'despues de borrar');
-    // if (!file) delete enterprise.image?;
-
     if (file) {
         const images = await uploadManyFiles([file], 'ENTERPRISE');
         const { key, url } = images[0];

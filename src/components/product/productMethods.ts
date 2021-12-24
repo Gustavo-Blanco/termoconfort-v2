@@ -1,4 +1,5 @@
 import { Image, PrismaClient, Product } from "@prisma/client"
+import { paginate } from "../../helpers/pagination";
 import { deleteFiles, uploadManyFiles } from "../../services/images/Cloudinary";
 import { ProductWithImages } from "./productStructure";
 
@@ -71,4 +72,28 @@ export const deleteImages = async (product: ProductWithImages) => {
         await deleteFiles(publicIds);
     }
     return images;
+}
+
+export const searchProducts = async (product: Product, limit: number = 10, page: number = 0) => {
+    const {skip, take} = paginate(limit, page);
+    
+    const products = await prisma.product.findMany({
+        where:{
+            ...product,
+            name: {
+                contains: product.name || ''
+            },
+            isActive: true,
+            enterprise: {
+                isActive: true
+            }
+        },
+        skip,
+        take,
+        include: {
+            images: true
+        }
+    });
+    return products;
+
 }

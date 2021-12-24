@@ -9,16 +9,24 @@ export const formatRequest = (body: any) => {
     
     const keyValues = keyValuesPair.map((pair) => {
         const [key, value] = pair;
+
+        if (typeof value == 'boolean' || typeof value == 'number') {
+            return {key, value}
+        }
+
         if (value === '') {
             return {key, value: ''}
         }
         
+        
         if (value === 'true' || value === 'false') {
+            
             return {
                 key,
                 value: value === 'true'
             }
         }
+        
         if (!isNaN(Number(value))) {
             return {
                 key,
