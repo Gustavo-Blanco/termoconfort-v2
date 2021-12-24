@@ -16,6 +16,7 @@ export const savePost = async (data: Post): Promise<Post> => {
 }
 
 export const updatePost = async (id: number, data: Post): Promise<Post> => {
+    data.updatedAt = new Date();
     const post = await prisma.post.update({ where: { id }, data });
 
     return post;
@@ -37,6 +38,11 @@ export const searchPost = async (postReq: Post, limit: number = 10, page: number
             ...postReq,
             title: { contains: postReq.title || '' },
             isActive: true
+        },
+        include:{
+            _count: {
+                select: {comments: true}
+            }
         },
         skip,
         take

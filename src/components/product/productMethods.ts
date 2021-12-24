@@ -37,6 +37,7 @@ export const updateProduct = async (product: ProductWithImages, prod: Product, f
         where: { id },
         data: {
             ...prod,
+            updatedAt: new Date(),
             images: {
                 createMany: {
                     data: imagesToInsert

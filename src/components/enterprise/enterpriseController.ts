@@ -1,9 +1,9 @@
 import { Enterprise, PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import { getId } from "../../helpers/reqRes";
 import { formartReqUpdate, formatRequest } from "../../helpers/requestForm";
 import { errorDefault, IResult, result } from "../../response/default";
 import { imageEnterprise, searchEnterprises } from "./enterpriseMethods";
-import { IEnterpriseReq } from "./enterpriseStructure";
 
 const prisma = new PrismaClient();
 
@@ -47,6 +47,7 @@ export const update = async (req: Request, res: Response): Promise<Response<IRes
         const enterpriseReq = formartReqUpdate(formatRequest(req.body)) as Enterprise;
         const id = Number(req.params.id);
         const data = await imageEnterprise(enterpriseReq, req.file);
+        data.updatedAt = new Date();
         const enterprises = await prisma.enterprise.update({ where: { id }, data });
 
         return result(res, enterprises);
@@ -74,6 +75,19 @@ export const deactivate = async (req: Request, res: Response): Promise<Response<
         const enterprise = await prisma.enterprise.update({
             where: { id },
             data: { isActive: false }
+        });
+        return result(res, enterprise);
+    } catch (error: any) {
+        return result(res, error.toString(), false);
+    }
+}
+
+
+export const byUser = async (req: Request, res: Response): Promise<Response<IResult>> => {
+    try {
+        const userId = getId(req, 'userId');  
+        const enterprise = await prisma.enterprise.findFirst({
+            where: { userId, isActive: true }
         });
         return result(res, enterprise);
     } catch (error: any) {
