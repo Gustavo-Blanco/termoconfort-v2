@@ -1,6 +1,6 @@
 import { Enterprise, PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { formatRequest } from "../../helpers/requestForm";
+import { formartReqUpdate, formatRequest } from "../../helpers/requestForm";
 import { errorDefault, IResult, result } from "../../response/default";
 import { imageEnterprise, searchEnterprises } from "./enterpriseMethods";
 import { IEnterpriseReq } from "./enterpriseStructure";
@@ -12,7 +12,7 @@ export const all = async (req: Request, res: Response): Promise<Response<IResult
         const enterprises = await prisma.enterprise.findMany();
         return result(res, enterprises);
     } catch (error: any) {
-        return result(res, error.toString());
+        return result(res, error.toString(), false);
     }
 }
 
@@ -25,7 +25,7 @@ export const store = async (req: Request, res: Response): Promise<Response<IResu
         
         return result(res, enterprise);
     } catch (error: any) {
-        return result(res, error.toString());
+        return result(res, error.toString(), false);
     }
 }
 
@@ -38,13 +38,13 @@ export const get = async (req: Request, res: Response): Promise<Response<IResult
 
         return result(res, enterprise);
     } catch (error: any) {
-        return result(res, error.toString());
+        return result(res, error.toString(), false);
     }
 }
 
 export const update = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
-        const enterpriseReq = req.body as Enterprise;
+        const enterpriseReq =  formartReqUpdate(formatRequest(req.body)) as Enterprise;
         const id = Number(req.params.id);
 
         const data = await imageEnterprise(enterpriseReq, req.file);
@@ -52,7 +52,7 @@ export const update = async (req: Request, res: Response): Promise<Response<IRes
 
         return result(res, enterprises);
     } catch (error: any) {
-        return result(res, error.toString());
+        return result(res, error.toString(), false);
     }
 }
 
@@ -65,6 +65,6 @@ export const search = async (req: Request, res: Response): Promise<Response<IRes
         const enterprises = await searchEnterprises(enterpriseReq, limit, page);
         return result(res, enterprises);
     } catch (error: any) {
-        return result(res, error.toString());
+        return result(res, error.toString(), false);
     }
 }

@@ -28,7 +28,7 @@ export const uploadManyFiles = async (files: Express.Multer.File[], folder: stri
 
     for (const file of files) {
         const file64 = formatBufferTo64(file);
-        const { public_id, url } = await upload(file64.content!, folder);
+        const { public_id, url, } = await upload(file64.content!, folder);
         images.push({
             key: public_id,
             url: url
@@ -40,4 +40,8 @@ export const uploadManyFiles = async (files: Express.Multer.File[], folder: stri
 
 export const deleteFile = async (key: string) => {
     return await v2.uploader.destroy(key);
+}
+
+export const deleteFiles = async (keys: string[]) => {
+    return await v2.api.delete_resources(keys);
 }

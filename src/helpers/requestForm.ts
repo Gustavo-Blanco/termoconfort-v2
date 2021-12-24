@@ -6,12 +6,13 @@ export const isNumber = (value: any) => {
 export const formatRequest = (body: any) => {
     const keyValuesPair = Object.entries(body);
     const requestBody: any = {}
-
+    
     const keyValues = keyValuesPair.map((pair) => {
         const [key, value] = pair;
         if (value === '') {
             return {key, value: ''}
         }
+        
         if (value === 'true' || value === 'false') {
             return {
                 key,
@@ -19,7 +20,6 @@ export const formatRequest = (body: any) => {
             }
         }
         if (!isNaN(Number(value))) {
-            console.log(value,!isNaN(Number(value)))
             return {
                 key,
                 value: Number(value)
@@ -37,4 +37,11 @@ export const formatRequest = (body: any) => {
     }
     
     return requestBody;
+}
+
+export const formartReqUpdate = (body: any) => {
+    if (!body.image) return body;
+    if (body.image === 'undefined') delete body.image;
+    return body;
+    
 }

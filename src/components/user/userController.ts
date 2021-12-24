@@ -1,6 +1,6 @@
 import { PrismaClient, User } from "@prisma/client";
 import { Request, Response } from "express";
-import { formatRequest } from "../../helpers/requestForm";
+import { formartReqUpdate, formatRequest } from "../../helpers/requestForm";
 import { errorDefault, IResult, result } from "../../response/default";
 import { authByPassword } from "../../services/auth/login";
 import { register } from "../../services/auth/register";
@@ -85,7 +85,7 @@ export const update = async (
   res: Response
 ): Promise<Response<IResult>> => {
   try {
-    const data = formatRequest(req.body) as User;
+    const data = formartReqUpdate(formatRequest(req.body)) as User;
     const id = Number(req.params.id);
     // console.log(data);
     

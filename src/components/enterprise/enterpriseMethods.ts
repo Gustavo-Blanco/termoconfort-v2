@@ -8,10 +8,13 @@ export const imageEnterprise = async (enterprise: Enterprise, file?: Express.Mul
     const { imageKey } = enterprise;
     
     if (imageKey) {
-        await deleteFile(imageKey);
+        const delteF = await deleteFile(imageKey);
+        console.log(delteF,'delte file');
+        
         enterprise.imageKey = null;
     }
-
+    
+    // console.log(enterprise, 'despues de borrar');
     // if (!file) delete enterprise.image?;
 
     if (file) {
