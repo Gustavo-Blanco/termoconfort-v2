@@ -29,7 +29,7 @@ export const signUp = async (
     const user = await register(data);
     return result(res, user);
   } catch (error: any) {
-    return result(res, error.toString());
+    return result(res, error.toString(), false);
   }
 };
 
