@@ -70,10 +70,10 @@ model Product {
   name          String?     @db.VarChar(255)
   description   String?     @db.Text
   brand         String?     @db.VarChar(255)
-  capacity      String?     @db.VarChar(255)
+  capacity      Int?        @db.Int
   model         String?     @db.VarChar(255)
   type          String?     @db.VarChar(255)
-  energyConsume String?     @db.VarChar(255)
+  energyConsume Int?        @db.Int
   install       Boolean?    @default(true) @db.Bit(1)
   warranty      Boolean?    @default(true) @db.Bit(1)
   stock         Int?        @db.Int

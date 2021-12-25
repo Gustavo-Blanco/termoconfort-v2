@@ -4,7 +4,7 @@ import { formartReqUpdate, formatRequest } from "../../helpers/requestForm";
 import { errorDefault, IResult, result } from "../../response/default";
 import { authByPassword } from "../../services/auth/login";
 import { register } from "../../services/auth/register";
-import { updateUser } from "./userMethods";
+import { formatUserUpdateReq, updateUser } from "./userMethods";
 
 const prisma = new PrismaClient();
 
@@ -16,7 +16,7 @@ export const all = async (
     const users = await prisma.user.findMany();
     return result(res, users);
   } catch (error: any) {
-    return result(res, error.toString());
+    return result(res, error.toString(), false);
   }
 };
 
@@ -42,7 +42,7 @@ export const signIn = async (
     const user = await authByPassword(data.email, data.password!);
     return result(res, user);
   } catch (error: any) {
-    return result(res, error.toString());
+    return result(res, error.toString(), false);
   }
 };
 
@@ -58,7 +58,7 @@ export const byId = async (
 
     return result(res, user);
   } catch (error: any) {
-    return result(res, error.toString());
+    return result(res, error.toString(), false);
   }
 };
 
@@ -76,7 +76,7 @@ export const hasEnterprise = async (
 
     return result(res, check);
   } catch (error: any) {
-    return result(res, error.toString());
+    return result(res, error.toString(), false);
   }
 };
 
@@ -85,14 +85,13 @@ export const update = async (
   res: Response
 ): Promise<Response<IResult>> => {
   try {
-    const data = formartReqUpdate(formatRequest(req.body)) as User;
+    const data = formatUserUpdateReq(formartReqUpdate(formatRequest(req.body))) as User;
     const id = Number(req.params.id);
-    // console.log(data);
     
     const user = await updateUser(data, id, req.file);
     return result(res, user);
   } catch (error: any) {
-    return result(res, error.toString());
+    return result(res, error.toString(), false);
   }
 };
 
@@ -105,6 +104,6 @@ export const getEnterprise = async (req: Request, res: Response): Promise<Respon
 
       return result(res, enterprise);
   } catch (error: any) {
-      return result(res, error.toString());
+      return result(res, error.toString(), false);
   }
 }
