@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { getId } from "../../helpers/reqRes";
 import { formartReqUpdate, formatRequest } from "../../helpers/requestForm";
 import { errorDefault, IResult, result } from "../../response/default";
+import { saveEnterprise } from "./enterpriseDao";
 import { imageEnterprise, searchEnterprises } from "./enterpriseMethods";
 
 const prisma = new PrismaClient();
@@ -18,11 +19,7 @@ export const all = async (req: Request, res: Response): Promise<Response<IResult
 
 export const store = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
-        const enterpriseReq = formatRequest(req.body) as Enterprise;
-
-        const data = await imageEnterprise(enterpriseReq, req.file);
-        const enterprise = await prisma.enterprise.create({ data });
-
+        const enterprise = await saveEnterprise(req.body, req.file);
         return result(res, enterprise);
     } catch (error: any) {
         return result(res, error.toString(), false);

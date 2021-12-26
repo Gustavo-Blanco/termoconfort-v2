@@ -1,7 +1,6 @@
-import { Enterprise, Prisma, PrismaClient } from "@prisma/client";
+import { Enterprise, PrismaClient } from "@prisma/client";
 import { paginate } from "../../helpers/pagination";
 import { deleteFile, uploadManyFiles } from "../../services/images/Cloudinary";
-
 const prisma = new PrismaClient();
 
 export const imageEnterprise = async (enterprise: Enterprise, file?: Express.Multer.File): Promise<Enterprise> => {
@@ -9,7 +8,6 @@ export const imageEnterprise = async (enterprise: Enterprise, file?: Express.Mul
     
     if (imageKey) {
         const delteF = await deleteFile(imageKey);
-        console.log(delteF,'delte file');
         
         enterprise.imageKey = null;
     }
