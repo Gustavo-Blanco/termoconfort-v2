@@ -1,4 +1,4 @@
-import { Enterprise, PrismaClient, Product } from "@prisma/client"
+import { PrismaClient } from "@prisma/client"
 import { formatRequest } from "../../helpers/requestForm";
 import { imageEnterprise } from "./enterpriseMethods";
 

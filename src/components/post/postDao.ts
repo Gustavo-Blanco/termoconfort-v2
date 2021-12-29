@@ -1,5 +1,6 @@
 import { Post, PrismaClient } from "@prisma/client";
 import { paginate } from "../../helpers/pagination";
+import { toPostCardReq } from "../../response/PostCardReq";
 
 const prisma = new PrismaClient();
 
@@ -40,6 +41,12 @@ export const searchPost = async (postReq: Post, limit: number = 10, page: number
             isActive: true
         },
         include:{
+            user: {
+                select: {
+                    name: true,
+                    profileImage: true
+                }
+            },
             _count: {
                 select: {comments: true}
             }
@@ -47,5 +54,6 @@ export const searchPost = async (postReq: Post, limit: number = 10, page: number
         skip,
         take
     });
-    return posts;
+    
+    return toPostCardReq(posts);
 }
