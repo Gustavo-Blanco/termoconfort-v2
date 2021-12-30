@@ -1,60 +1,42 @@
-import { PrismaClient, User } from "@prisma/client";
 import { Request, Response } from "express";
-import { formartReqUpdate, formatRequest } from "../../helpers/requestForm";
-import { errorDefault, IResult, result } from "../../response/default";
-import { authByPassword } from "../../services/auth/login";
-import { register } from "../../services/auth/register";
-import { formatUserUpdateReq, updateUser } from "./userMethods";
+import { IResult, result } from "../../response/default";
+import { auth } from "../../services/auth/login";
+import { registerV2 } from "../../services/auth/register";
+import { formatUserUpdate } from "./userMethods";
+import { allUsers, userById, userHasEnterprise, updateUser, userGetEnterprise } from './userDao';
+import { getId } from "../../helpers/reqRes";
 
-const prisma = new PrismaClient();
-
-export const all = async (
-  req: Request,
-  res: Response
-): Promise<Response<IResult>> => {
+export const all = async (req: Request, res: Response): Promise<Response<IResult>> => {
   try {
-    const users = await prisma.user.findMany();
+    const users = await allUsers();
     return result(res, users);
   } catch (error: any) {
     return result(res, error.toString(), false);
   }
 };
 
-export const signUp = async (
-  req: Request,
-  res: Response
-): Promise<Response<IResult>> => {
+export const signUp = async (req: Request, res: Response): Promise<Response<IResult>> => {
   try {
-    const data = req.body as User;
-    const user = await register(data);
+    const user = await registerV2(req.body);
     return result(res, user);
   } catch (error: any) {
     return result(res, error.toString(), false);
   }
 };
 
-export const signIn = async (
-  req: Request,
-  res: Response
-): Promise<Response<IResult>> => {
+export const signIn = async (req: Request, res: Response): Promise<Response<IResult>> => {
   try {
-    const data = req.body as User;
-    const user = await authByPassword(data.email, data.password!);
+    const user = await auth(req.body);
     return result(res, user);
   } catch (error: any) {
     return result(res, error.toString(), false);
   }
 };
 
-export const byId = async (
-  req: Request,
-  res: Response
-): Promise<Response<IResult>> => {
+export const byId = async (req: Request, res: Response): Promise<Response<IResult>> => {
   try {
-    const id = Number(req.params.id);
-    const user = await prisma.user.findFirst({ where: { id } });
-
-    if (!user) throw errorDefault(`There is not result with id ${id}`);
+    const id = getId(req, 'id');
+    const user = await userById(id);
 
     return result(res, user);
   } catch (error: any) {
@@ -62,17 +44,10 @@ export const byId = async (
   }
 };
 
-export const hasEnterprise = async (
-  req: Request,
-  res: Response
-): Promise<Response<IResult>> => {
+export const hasEnterprise = async (req: Request, res: Response): Promise<Response<IResult>> => {
   try {
-    const id = Number(req.params.id);
-
-    const enterprises = await prisma.enterprise.count({
-      where: { userId: id, isActive: true },
-    });
-    const check = enterprises != 0;
+    const id = getId(req, 'id');
+    const check = await userHasEnterprise(id);
 
     return result(res, check);
   } catch (error: any) {
@@ -80,15 +55,13 @@ export const hasEnterprise = async (
   }
 };
 
-export const update = async (
-  req: Request,
-  res: Response
-): Promise<Response<IResult>> => {
+export const update = async (req: Request, res: Response): Promise<Response<IResult>> => {
   try {
-    const data = formatUserUpdateReq(formartReqUpdate(formatRequest(req.body))) as User;
-    const id = Number(req.params.id);
-    
-    const user = await updateUser(data, id, req.file);
+
+    const userReq = formatUserUpdate(req.body);
+    const id = getId(req, 'id');
+    const user = await updateUser(userReq, id, req.file);
+
     return result(res, user);
   } catch (error: any) {
     return result(res, error.toString(), false);
@@ -97,13 +70,11 @@ export const update = async (
 
 export const getEnterprise = async (req: Request, res: Response): Promise<Response<IResult>> => {
   try {
-      const id = Number(req.params.id);
-      const enterprise = await prisma.enterprise.findFirst({ where: { userId: id, isActive: true } });
+    const id = getId(req, 'id');
+    const enterprise = await userGetEnterprise(id);
 
-      if (!enterprise) throw errorDefault("You don't have an enterprise");
-
-      return result(res, enterprise);
+    return result(res, enterprise);
   } catch (error: any) {
-      return result(res, error.toString(), false);
+    return result(res, error.toString(), false);
   }
 }

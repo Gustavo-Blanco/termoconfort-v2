@@ -12,10 +12,13 @@ datasource db {
 
 //models
 model User {
-  id           Int          @id @default(autoincrement())
-  email        String       @unique
-  name         String?      @db.VarChar(255)
-  password     String?      @db.VarChar(255)
+  id             Int     @id @default(autoincrement())
+  email          String  @unique
+  name           String? @db.VarChar(255)
+  password       String? @db.VarChar(255)
+  hashedPassword String? @db.VarChar(255)
+  googleId       String? @db.VarChar(255)
+
   phoneNumber  String?      @db.VarChar(9)
   profileImage String?      @db.VarChar(255)
   profileKey   String?      @db.VarChar(255)
@@ -34,6 +37,7 @@ model Enterprise {
   id          Int      @id @default(autoincrement())
   user        User?    @relation(fields: [userId], references: [id])
   userId      Int?
+  ruc         String?  @db.VarChar(255)
   name        String?  @db.VarChar(255)
   description String?  @db.Text
   imageUrl    String?  @db.VarChar(255)
