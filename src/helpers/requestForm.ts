@@ -53,3 +53,8 @@ export const formartReqUpdate = (body: any) => {
     return body;
     
 }
+
+export const toStringIfNumber = (value: any) => {
+    if(typeof value === 'string') return Number(value);
+    return value;
+}

@@ -1,16 +1,13 @@
-import { Enterprise, PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { getId } from "../../helpers/reqRes";
-import { formartReqUpdate, formatRequest } from "../../helpers/requestForm";
-import { errorDefault, IResult, result } from "../../response/default";
-import { saveEnterprise } from "./enterpriseDao";
-import { imageEnterprise, searchEnterprises } from "./enterpriseMethods";
+import { getId, getPaginateParams } from "../../helpers/reqRes";
+import { IResult, result } from "../../response/default";
+import { allEnterprises, deactivateEnterprise, enterpriseByUser, getEnterpriseById, saveEnterprise, updateEnterprise } from "./enterpriseDao";
+import { searchEnterprises } from "./enterpriseMethods";
 
-const prisma = new PrismaClient();
 
 export const all = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
-        const enterprises = await prisma.enterprise.findMany();
+        const enterprises = await allEnterprises();
         return result(res, enterprises);
     } catch (error: any) {
         return result(res, error.toString(), false);
@@ -28,11 +25,8 @@ export const store = async (req: Request, res: Response): Promise<Response<IResu
 
 export const get = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
-        const id = Number(req.params.id);
-        const enterprise = await prisma.enterprise.findFirst({ where: { id } });
-
-        if (!enterprise) throw errorDefault("There is not enterprise with id " + id);
-
+        const id = getId(req, 'id');
+        const enterprise = await getEnterpriseById(id);
         return result(res, enterprise);
     } catch (error: any) {
         return result(res, error.toString(), false);
@@ -41,13 +35,10 @@ export const get = async (req: Request, res: Response): Promise<Response<IResult
 
 export const update = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
-        const enterpriseReq = formartReqUpdate(formatRequest(req.body)) as Enterprise;
-        const id = Number(req.params.id);
-        const data = await imageEnterprise(enterpriseReq, req.file);
-        data.updatedAt = new Date();
-        const enterprises = await prisma.enterprise.update({ where: { id }, data });
+        const id = getId(req, 'id');
+        const enterprise = await updateEnterprise(req.body, id, req.file)
 
-        return result(res, enterprises);
+        return result(res, enterprise);
     } catch (error: any) {
         return result(res, error.toString(), false);
     }
@@ -55,11 +46,8 @@ export const update = async (req: Request, res: Response): Promise<Response<IRes
 
 export const search = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
-        const enterpriseReq = req.body as Enterprise;
-        const limit = Number(req.query.limit) || 10;
-        const page = Number(req.query.page) || 0;
-
-        const enterprises = await searchEnterprises(enterpriseReq, limit, page);
+        const { limit, page } = getPaginateParams(req);
+        const enterprises = await searchEnterprises(req.body, limit, page);
         return result(res, enterprises);
     } catch (error: any) {
         return result(res, error.toString(), false);
@@ -68,11 +56,8 @@ export const search = async (req: Request, res: Response): Promise<Response<IRes
 
 export const deactivate = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
-        const id = Number(req.params.id);
-        const enterprise = await prisma.enterprise.update({
-            where: { id },
-            data: { isActive: false }
-        });
+        const id = getId(req, 'id');
+        const enterprise = await deactivateEnterprise(id);
         return result(res, enterprise);
     } catch (error: any) {
         return result(res, error.toString(), false);
@@ -82,10 +67,8 @@ export const deactivate = async (req: Request, res: Response): Promise<Response<
 
 export const byUser = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
-        const userId = getId(req, 'userId');  
-        const enterprise = await prisma.enterprise.findFirst({
-            where: { userId, isActive: true }
-        });
+        const userId = getId(req, 'userId');
+        const enterprise = await enterpriseByUser(userId);
         return result(res, enterprise);
     } catch (error: any) {
         return result(res, error.toString(), false);

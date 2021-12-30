@@ -1,6 +1,7 @@
-import { PrismaClient } from "@prisma/client"
-import { formatRequest } from "../../helpers/requestForm";
-import { imageEnterprise } from "./enterpriseMethods";
+import { Enterprise, PrismaClient } from "@prisma/client"
+import { paginate } from "../../helpers/pagination";
+import { errorDefault } from "../../response/default";
+import { formatEnterprise, imageEnterprise } from "./enterpriseMethods";
 
 const prisma = new PrismaClient();
 
@@ -10,10 +11,68 @@ export const allEnterprises = async () => {
 }
 
 export const saveEnterprise = async (body: any, file?: Express.Multer.File) => {
-    const reqBody = formatRequest(body);
+    const reqBody = formatEnterprise(body);
+
     const data = await imageEnterprise(reqBody, file);
     const enterprise = await prisma.enterprise.create({
         data: data
     });
     return enterprise;
+}
+
+export const getEnterpriseById = async (id: number) => {
+    const enterprise = await prisma.enterprise.findFirst({ where: { id } });
+
+    if (!enterprise) throw errorDefault("There is not enterprise with id " + id);
+
+    return enterprise;
+}
+
+
+export const updateEnterprise = async (body: any, id: number, file?: Express.Multer.File) => {
+    const reqBody = formatEnterprise(body);
+
+    const data = await imageEnterprise(reqBody, file);
+    const enterprise = await prisma.enterprise.update({
+        where: { id },
+        data: {
+            ...data,
+            updatedAt: new Date()
+        }
+    });
+    return enterprise;
+}
+
+
+export const searchEnterprises = async (enterprise: Enterprise, limit: number = 10, page: number = 0): Promise<Enterprise[]> => {
+    const { skip, take } = paginate(limit, page);
+    const enterprises = await prisma.enterprise.findMany({
+        where: {
+            ...enterprise,
+            name: {
+                contains: enterprise.name || ''
+            },
+            isActive: true
+        },
+        skip,
+        take
+
+    });
+
+    return enterprises;
+}
+
+export const deactivateEnterprise = async (id: number) => {
+    const enterprise = await prisma.enterprise.update({
+        where: { id },
+        data: { isActive: false }
+    });
+    return enterprise
+}
+
+export const enterpriseByUser = async (userId: number) => {
+    const enterprise = await prisma.enterprise.findFirst({
+        where: { userId, isActive: true }
+    });
+    return enterprise
 }
