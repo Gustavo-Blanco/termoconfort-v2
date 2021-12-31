@@ -58,3 +58,8 @@ export const toStringIfNumber = (value: any) => {
     if(typeof value === 'string') return Number(value);
     return value;
 }
+
+export const toStringIfBoolean = (value: any) => {
+    if(typeof value === 'string') return value === 'true';
+    return value;
+}

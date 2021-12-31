@@ -1,57 +1,10 @@
 import { Image, PrismaClient, Product } from "@prisma/client"
 import { paginate } from "../../helpers/pagination";
+import { toStringIfBoolean, toStringIfNumber } from "../../helpers/requestForm";
 import { deleteFiles, uploadManyFiles } from "../../services/images/Cloudinary";
-import { ProductWithImages } from "./productStructure";
+import { imagesByProduct } from "../image/imageDao";
 
 const prisma = new PrismaClient();
-
-export const saveProduct = async (product: Product, files?: Express.Multer.File[]) => {
-    const images = await saveImages(product, files);
-    const saved = await prisma.product.create({
-        data: {
-            ...product,
-            images: {
-                createMany: {
-                    data: images
-                }
-            }
-        },
-        include: { images: true }
-    });
-    return saved;
-}
-
-export const updateProduct = async (product: ProductWithImages, prod: Product, files?: Express.Multer.File[]) => {
-    const { id } = product;
-    let imagesToDelete: number[] = [];
-    let imagesToInsert: Image[] = [];
-    if (files) {
-        imagesToDelete = (await deleteImages(product)).map(image => image.id);
-        imagesToInsert = (await saveImages(product, files));
-    }
-    
-    if (imagesToDelete.length > 0) {
-        await prisma.image.deleteMany({ where: { id: { in: imagesToDelete } } });
-    }
-    const updated = await prisma.product.update({
-        where: { id },
-        data: {
-            ...prod,
-            updatedAt: new Date(),
-            images: {
-                createMany: {
-                    data: imagesToInsert
-                }
-            }
-        },
-        include:{
-            images: true
-        },
-    });
-
-    return updated;
-    
-}
 
 export const saveImages = async (product: Product, files?: Express.Multer.File[]) => {
 
@@ -62,16 +15,6 @@ export const saveImages = async (product: Product, files?: Express.Multer.File[]
         images = imagesRes.map(({ key, url }) => ({ key, url })) as Image[];
     }
 
-    return images;
-}
-
-export const deleteImages = async (product: ProductWithImages) => {
-    const { images } = product;
-    
-    if (images.length > 0) {
-        const publicIds = images.map(image => image.key!);
-        await deleteFiles(publicIds);
-    }
     return images;
 }
 
@@ -97,4 +40,60 @@ export const searchProducts = async (product: Product, limit: number = 10, page:
     });
     return products;
 
+}
+
+export const formatProduct = (body: Product) => {
+    const {
+        enterpriseId,
+        name,
+        description,
+        brand,
+        capacity,
+        model,
+        type,
+        energyConsume,
+        install,
+        warranty,
+        stock,
+        price
+    } = body;
+
+    const product = {
+        enterpriseId: toStringIfNumber(enterpriseId),
+        name,
+        description,
+        brand,
+        capacity: toStringIfNumber(capacity),
+        model,
+        type,
+        energyConsume: toStringIfNumber(energyConsume),
+        install: toStringIfBoolean(install),
+        warranty: toStringIfBoolean(warranty),
+        stock: toStringIfNumber(stock),
+        price: toStringIfNumber(price)
+    } as Product;
+
+    return product; 
+}
+
+
+export const deleteImagesV2 = async (imagesModel: Image[]) => {
+    if (imagesModel.length > 0) {
+        const imageKeys = imagesModel.map(image => image.key!);
+        const imageIds = imagesModel.map(image => image.id!);
+
+        await deleteFiles(imageKeys);
+        await prisma.image.deleteMany({ where: { id: { in: imageIds } } });
+    }
+}
+
+export const saveImagesCloud = async (productReq:Product, files?: Express.Multer.File[]) => {
+    if (files) {
+        const imagesModel = await imagesByProduct(productReq.id);
+        await deleteImagesV2(imagesModel);
+
+        const imagesToInsert = await saveImages(productReq, files);
+        return imagesToInsert;
+    }
+    return [] as Image[];
 }

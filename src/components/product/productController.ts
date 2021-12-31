@@ -1,15 +1,16 @@
-import { PrismaClient, Product } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { IResult, result } from "../../response/default";
 import { Request, Response } from 'express'
-import { saveProduct, searchProducts, updateProduct } from "./productMethods";
-import { formatRequest } from "../../helpers/requestForm";
+import { storeProduct, updateProduct, searchProducts, deactiveProduct } from "./productDao";
+import { getId, getPaginateParams } from "../../helpers/reqRes";
+import { allImages } from "../image/imageDao";
 
 const prisma = new PrismaClient();
 
 export const all = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
 
-        const products = await prisma.product.findMany({include: {images: true}});
+        const products = await prisma.product.findMany({ include: { images: true } });
         return result(res, products);
     } catch (error: any) {
         return result(res, error.toString(), false);
@@ -18,10 +19,9 @@ export const all = async (req: Request, res: Response): Promise<Response<IResult
 
 export const store = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
-        const productReq = formatRequest(req.body) as Product;
         const files = req.files as Express.Multer.File[];
-        const product = await saveProduct(productReq, files);
-        
+        const product = await storeProduct(req.body, files);
+
         return result(res, product);
     } catch (error: any) {
         return result(res, error.toString(), false);
@@ -30,14 +30,11 @@ export const store = async (req: Request, res: Response): Promise<Response<IResu
 
 export const update = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
-        const productReq = formatRequest(req.body) as Product;
-        
+        const id = getId(req, 'id');
         const files = req.files as Express.Multer.File[];
-        const id = Number(req.params.id);
-        const product = await prisma.product.findFirst({where: {id}, include: {images: true}});
-        const updated = await updateProduct(product!,productReq, files );
+        const product = await updateProduct(req.body, id, files);
 
-        return result(res, updated);
+        return result(res, product);
     } catch (error: any) {
         return result(res, error.toString(), false);
     }
@@ -45,36 +42,28 @@ export const update = async (req: Request, res: Response): Promise<Response<IRes
 
 export const search = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
-        const productReq = formatRequest(req.body) as Product;
-        const limit = Number(req.query.limit) || 10;
-        const page = Number(req.query.page) || 0;
-        const products = await searchProducts(productReq, limit, page);
+        const { page, limit } = getPaginateParams(req);
+        const products = await searchProducts(req.body, limit, page);
         return result(res, products);
     } catch (error: any) {
         return result(res, error.toString(), false);
     }
 }
 
-
 export const images = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
-        
-        
-        return result(res, await prisma.image.findMany());
+        const images = await allImages();
+        return result(res, images);
     } catch (error: any) {
         return result(res, error.toString(), false);
     }
 }
 
-
 export const deactive = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
-        const id = Number(req.params.id);
-        const enterprise = await prisma.product.update({
-            where: { id },
-            data: { isActive: false }
-        });
-        return result(res, enterprise);
+        const id = getId(req, 'id');
+        const product = await deactiveProduct(id);
+        return result(res, product);
     } catch (error: any) {
         return result(res, error.toString(), false);
     }
