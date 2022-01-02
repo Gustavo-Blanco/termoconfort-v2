@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { all, store, update, get, search, deactivate, byUser } from './enterpriseController'
+import { all, store, update, get, search, deactivate, byUser, updateState } from './enterpriseController'
 import { uploadMulter } from '../../services/images/Multer';
 
 const router: Router = Router();
@@ -11,5 +11,6 @@ router.route('/by-id/:id').get(get);
 router.route('/search').post(search);
 router.route('/deactivate/:id').put(deactivate);
 router.route('/by-user/:userId').get(byUser);
+router.route('/update-state/:id').put(updateState);
 
 export default router;

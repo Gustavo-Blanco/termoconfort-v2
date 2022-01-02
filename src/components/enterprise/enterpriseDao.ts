@@ -76,3 +76,10 @@ export const enterpriseByUser = async (userId: number) => {
     });
     return enterprise
 }
+
+export const updateStateEnterprise = async (id: number, state: number) => {
+    const enterprise = await prisma.enterprise.update({
+        where: { id }, data: { state }
+    });
+    return enterprise
+}
