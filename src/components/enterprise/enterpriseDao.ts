@@ -46,6 +46,7 @@ export const updateEnterprise = async (body: any, id: number, file?: Express.Mul
 
 export const searchEnterprises = async (enterprise: Enterprise, limit: number = 10, page: number = 0): Promise<Enterprise[]> => {
     const { skip, take } = paginate(limit, page);
+    
     const enterprises = await prisma.enterprise.findMany({
         where: {
             ...enterprise,
@@ -82,4 +83,11 @@ export const updateStateEnterprise = async (id: number, state: number) => {
         where: { id }, data: { state }
     });
     return enterprise
+}
+
+export const getPagination = async (limit: number = 9) => {
+    const countEnteprises = await prisma.enterprise.count();
+    const defaultPage = Math.floor(countEnteprises/limit);
+    const pagination = defaultPage + (countEnteprises % limit != 0 ? 1 : 0);
+    return pagination;
 }

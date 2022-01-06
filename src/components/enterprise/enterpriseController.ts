@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import { getId, getPaginateParams } from "../../helpers/reqRes";
 import { IResult, result } from "../../response/default";
-import { allEnterprises, deactivateEnterprise, enterpriseByUser, getEnterpriseById, saveEnterprise, updateEnterprise, updateStateEnterprise } from "./enterpriseDao";
-import { searchEnterprises } from "./enterpriseMethods";
-
+import { allEnterprises, deactivateEnterprise, enterpriseByUser, getEnterpriseById, saveEnterprise, updateEnterprise, updateStateEnterprise, searchEnterprises, getPagination } from "./enterpriseDao";
+import { formatPagination } from './enterpriseMethods';
 
 export const all = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
@@ -47,8 +46,10 @@ export const update = async (req: Request, res: Response): Promise<Response<IRes
 export const search = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
         const { limit, page } = getPaginateParams(req);
+        
         const enterprises = await searchEnterprises(req.body, limit, page);
-        return result(res, enterprises);
+        const data = await formatPagination(enterprises, limit);   
+        return result(res, data);
     } catch (error: any) {
         return result(res, error.toString(), false);
     }

@@ -1,8 +1,8 @@
-import { Enterprise, PrismaClient } from "@prisma/client";
-import { paginate } from "../../helpers/pagination";
+import { Enterprise } from "@prisma/client";
 import { toStringIfNumber } from "../../helpers/requestForm";
 import { deleteFile, uploadManyFiles } from "../../services/images/Cloudinary";
-const prisma = new PrismaClient();
+import { getPagination } from './enterpriseDao';
+import { IEntepriseSearchPage } from './enterpriseStructure';
 
 export const imageEnterprise = async (enterprise: Enterprise, file?: Express.Multer.File): Promise<Enterprise> => {
     const { imageKey } = enterprise;
@@ -18,24 +18,6 @@ export const imageEnterprise = async (enterprise: Enterprise, file?: Express.Mul
 
     return enterprise;
 
-}
-
-export const searchEnterprises = async (enterprise: Enterprise, limit: number = 10, page: number = 0): Promise<Enterprise[]> => {
-    const { skip, take } = paginate(limit, page);
-    const enterprises = await prisma.enterprise.findMany({
-        where: {
-            ...enterprise,
-            name: {
-                contains: enterprise.name || ''
-            },
-            isActive: true
-        },
-        skip,
-        take
-
-    });
-
-    return enterprises;
 }
 
 export const formatEnterprise = (body: Enterprise) => {
@@ -74,4 +56,13 @@ export const formatEnterprise = (body: Enterprise) => {
     if(imageKey && imageKey !== '') enterprise.imageKey = imageKey;
 
     return enterprise;
+}
+
+
+export const formatPagination = async (enterprises: Enterprise[], limit: number) => {
+    const pages = await getPagination(limit);
+    return {
+        enterprises,
+        pages
+    } as IEntepriseSearchPage
 }
