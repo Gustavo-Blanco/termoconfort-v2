@@ -83,3 +83,11 @@ export const deactiveProduct = async (id: number) => {
     });
     return product;
 }
+
+
+export const getPagination = async (limit: number = 9) => {
+    const countProducts = await prisma.product.count();
+    const defaultPage = Math.floor(countProducts/limit);
+    const pagination = defaultPage + (countProducts % limit != 0 ? 1 : 0);
+    return pagination;
+}

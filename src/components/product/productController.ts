@@ -4,6 +4,7 @@ import { Request, Response } from 'express'
 import { storeProduct, updateProduct, searchProducts, deactiveProduct } from "./productDao";
 import { getId, getPaginateParams } from "../../helpers/reqRes";
 import { allImages } from "../image/imageDao";
+import { formatPagination } from './productMethods';
 
 const prisma = new PrismaClient();
 
@@ -44,7 +45,8 @@ export const search = async (req: Request, res: Response): Promise<Response<IRes
     try {
         const { page, limit } = getPaginateParams(req);
         const products = await searchProducts(req.body, limit, page);
-        return result(res, products);
+        const data = await formatPagination(products, limit);
+        return result(res, data);
     } catch (error: any) {
         return result(res, error.toString(), false);
     }

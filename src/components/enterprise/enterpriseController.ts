@@ -48,7 +48,7 @@ export const search = async (req: Request, res: Response): Promise<Response<IRes
         const { limit, page } = getPaginateParams(req);
         
         const enterprises = await searchEnterprises(req.body, limit, page);
-        const data = await formatPagination(enterprises, limit);   
+        const data = await formatPagination(enterprises, limit);
         return result(res, data);
     } catch (error: any) {
         return result(res, error.toString(), false);

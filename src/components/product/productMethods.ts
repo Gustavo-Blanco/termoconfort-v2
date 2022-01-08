@@ -3,6 +3,8 @@ import { paginate } from "../../helpers/pagination";
 import { toStringIfBoolean, toStringIfNumber } from "../../helpers/requestForm";
 import { deleteFiles, uploadManyFiles } from "../../services/images/Cloudinary";
 import { imagesByProduct } from "../image/imageDao";
+import { getPagination } from './productDao';
+import { IProductSearchPage } from './productStructure';
 
 const prisma = new PrismaClient();
 
@@ -96,4 +98,13 @@ export const saveImagesCloud = async (productReq:Product, files?: Express.Multer
         return imagesToInsert;
     }
     return [] as Image[];
+}
+
+
+export const formatPagination = async (products: Product[], limit: number) => {
+    const pages = await getPagination(limit);
+    return {
+        products,
+        pages
+    } as IProductSearchPage
 }
