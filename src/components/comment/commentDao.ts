@@ -1,4 +1,5 @@
 import { Comment, PrismaClient } from "@prisma/client"
+import { parseToCommentUserReq } from '../../response/CommentUserReq';
 
 const prisma = new PrismaClient();
 
@@ -19,6 +20,16 @@ export const updateComment = async (data: Comment, id: number) => {
 }
 
 export const getCommentByPostUser = async (comment: Comment) => {
-    const comments = await prisma.comment.findMany({ where: { ...comment }});
-    return comments;
+    const comments = await prisma.comment.findMany({ 
+        where: { ...comment },
+        include: {
+            user: {
+                select: {
+                    name: true,
+                    profileImage: true
+                }
+            }
+        }
+    });
+    return parseToCommentUserReq(comments);
 }
