@@ -2,7 +2,7 @@ import { Comment } from "@prisma/client";
 import { Response, Request } from "express";
 import { getId } from "../../helpers/reqRes";
 import { IResult, result } from "../../response/default";
-import { allComments, saveComment, updateComment } from "./commentDao";
+import { allComments, saveComment, updateComment, getCommentByPostUser } from "./commentDao";
 
 export const all = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
@@ -27,6 +27,15 @@ export const update = async (req: Request, res: Response): Promise<Response<IRes
         const id = getId(req, 'id');
         const comment = await updateComment(req.body as Comment, id);
         return result(res, comment);
+    } catch (error: any) {
+        return result(res, error.toString(), false);
+    }
+}
+
+export const byUserPost = async (req: Request, res: Response): Promise<Response<IResult>> => {
+    try {
+        const comments = await getCommentByPostUser(req.body);
+        return result(res, comments);
     } catch (error: any) {
         return result(res, error.toString(), false);
     }

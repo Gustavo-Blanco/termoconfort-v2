@@ -17,3 +17,8 @@ export const updateComment = async (data: Comment, id: number) => {
     const comment = await prisma.comment.update({ where: { id }, data: data });
     return comment;
 }
+
+export const getCommentByPostUser = async (comment: Comment) => {
+    const comments = await prisma.comment.findMany({ where: { ...comment }});
+    return comments;
+}
