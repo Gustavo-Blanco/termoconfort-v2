@@ -87,7 +87,11 @@ export const updateStateEnterprise = async (id: number, state: number) => {
 
 export const getPagination = async (limit: number = 9) => {
     const countEnteprises = await prisma.enterprise.count();
-    const defaultPage = Math.floor(countEnteprises/limit);
-    const pagination = defaultPage + (countEnteprises % limit != 0 ? 1 : 0);
-    return pagination;
+    if(countEnteprises <= limit) return 0;
+
+    let defaultPage = Math.floor(countEnteprises / limit);
+    
+    if(countEnteprises % limit != 0) defaultPage + 1;
+
+    return defaultPage;
 }
