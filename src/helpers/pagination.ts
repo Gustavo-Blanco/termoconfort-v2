@@ -3,3 +3,5 @@ export const paginate = (limit: number, page: number) => {
     const take = page == 0 ? limit : limit * page;
     return {take, skip}
 }
+
+

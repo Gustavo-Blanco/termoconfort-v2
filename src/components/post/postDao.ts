@@ -57,3 +57,14 @@ export const searchPost = async (postReq: Post, limit: number = 10, page: number
     
     return toPostCardReq(posts);
 }
+
+export const getPagination = async (limit: number = 9) => {
+    const countPosts = await prisma.post.count();
+    if(countPosts <= limit) return 0;
+
+    let defaultPage = Math.floor(countPosts/limit);
+
+    if(countPosts % limit != 0) defaultPage + 1;
+    
+    return defaultPage;
+}

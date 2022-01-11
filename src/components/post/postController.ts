@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { getId, getIdAndData, getPaginateParams } from "../../helpers/reqRes";
 import { IResult, result } from "../../response/default";
 import { deactivePost, getAll, savePost, searchPost, updatePost } from "./postDao";
+import { formatPagination } from './postMethods';
 
 export const all = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
@@ -46,7 +47,9 @@ export const search = async (req: Request, res: Response): Promise<Response<IRes
     try {
         const { page, limit } = getPaginateParams(req);
         const posts = await searchPost(req.body, limit, page);
-        return result(res, posts);
+        const data = await formatPagination(posts, limit);
+
+        return result(res, data);
     } catch (error: any) {
         return result(res, error.toString(), false);
     }
