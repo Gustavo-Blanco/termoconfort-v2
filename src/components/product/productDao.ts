@@ -62,6 +62,12 @@ export const searchProducts = async (productReq: Product, limit: number = 10, pa
             name: {
                 contains: productReq.name || ''
             },
+            capacity: {
+                lte: productReq.capacity!
+            },
+            energyConsume: {
+                lte: productReq.energyConsume!
+            },
             isActive: true,
             enterprise: {
                 isActive: true
