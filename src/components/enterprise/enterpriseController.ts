@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { getId, getPaginateParams } from "../../helpers/reqRes";
 import { IResult, result } from "../../response/default";
-import { allEnterprises, deactivateEnterprise, enterpriseByUser, getEnterpriseById, saveEnterprise, updateEnterprise, updateStateEnterprise, searchEnterprises, getPagination } from "./enterpriseDao";
-import { formatPagination } from './enterpriseMethods';
+import { allEnterprises, deactivateEnterprise, enterpriseByUser, getEnterpriseById, saveEnterprise, updateEnterprise, updateStateEnterprise, searchEnterprises, getPagination, getInteresteds } from "./enterpriseDao";
+import { formatPagination, formatResInteresteds } from './enterpriseMethods';
 
 export const all = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
@@ -82,6 +82,18 @@ export const updateState = async (req: Request, res: Response): Promise<Response
         const state = Number(req.body.state);
         const enterprise = await updateStateEnterprise(id, state);
         return result(res, enterprise);
+    } catch (error: any) {
+        return result(res, error.toString(), false);
+    }
+}
+
+export const interesteds = async (req: Request, res: Response): Promise<Response<IResult>> => {
+    try {
+        const id = getId(req, 'id');
+        const orders = await getInteresteds(id);
+        
+        const interesteds = formatResInteresteds(orders);
+        return result(res, interesteds);
     } catch (error: any) {
         return result(res, error.toString(), false);
     }

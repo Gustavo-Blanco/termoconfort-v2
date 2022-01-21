@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { IResult, result } from "../../response/default";
 import { Request, Response } from 'express'
-import { storeProduct, updateProduct, searchProducts, deactiveProduct } from "./productDao";
+import { storeProduct, updateProduct, searchProducts, deactiveProduct, addOrder } from "./productDao";
 import { getId, getPaginateParams } from "../../helpers/reqRes";
 import { allImages } from "../image/imageDao";
 import { formatPagination } from './productMethods';
@@ -66,6 +66,15 @@ export const deactive = async (req: Request, res: Response): Promise<Response<IR
         const id = getId(req, 'id');
         const product = await deactiveProduct(id);
         return result(res, product);
+    } catch (error: any) {
+        return result(res, error.toString(), false);
+    }
+}
+
+export const addInterested = async (req: Request, res: Response): Promise<Response<IResult>> => {
+    try {
+        const order = await addOrder(req.body);
+        return result(res, order);
     } catch (error: any) {
         return result(res, error.toString(), false);
     }

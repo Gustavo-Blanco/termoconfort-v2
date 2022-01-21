@@ -2,7 +2,7 @@ import { Enterprise } from "@prisma/client";
 import { toStringIfNumber } from "../../helpers/requestForm";
 import { deleteFile, uploadManyFiles } from "../../services/images/Cloudinary";
 import { getPagination } from './enterpriseDao';
-import { IEntepriseSearchPage } from './enterpriseStructure';
+import { IEntepriseSearchPage, IInterested, OrdersUserProduct } from './enterpriseStructure';
 
 export const imageEnterprise = async (enterprise: Enterprise, file?: Express.Multer.File): Promise<Enterprise> => {
     const { imageKey } = enterprise;
@@ -53,7 +53,7 @@ export const formatEnterprise = (body: Enterprise) => {
         workers: toStringIfNumber(workers)
     } as Enterprise;
 
-    if(imageKey && imageKey !== '') enterprise.imageKey = imageKey;
+    if (imageKey && imageKey !== '') enterprise.imageKey = imageKey;
 
     return enterprise;
 }
@@ -65,4 +65,25 @@ export const formatPagination = async (enterprises: Enterprise[], limit: number)
         enterprises,
         pages
     } as IEntepriseSearchPage
+}
+
+export const formatResInteresteds = (interesteds: OrdersUserProduct[]) => {
+    const data = interesteds.map(interested => {
+        const { id: productId, name, stock, price } = interested.product!;
+        const { id: userId, email, name: user } = interested.user!;
+
+        return {
+            id: interested.id,
+            productId,
+            name,
+            stock,
+            price,
+            userId,
+            email,
+            user,
+        }
+
+    }) as IInterested[];
+
+    return data;
 }

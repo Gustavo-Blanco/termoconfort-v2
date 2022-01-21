@@ -1,4 +1,4 @@
-import { PrismaClient, Product } from "@prisma/client"
+import { Order, PrismaClient, Product } from "@prisma/client"
 import { paginate } from "../../helpers/pagination";
 import { formatProduct, saveImages, saveImagesCloud } from "./productMethods";
 
@@ -93,12 +93,16 @@ export const deactiveProduct = async (id: number) => {
 
 export const getPagination = async (limit: number = 9) => {
     const countProducts = await prisma.product.count();
-    if(countProducts <= limit) return 0;
+    if (countProducts <= limit) return 0;
 
-    let defaultPage = Math.floor(countProducts/limit);
+    let defaultPage = Math.floor(countProducts / limit);
 
-    if(countProducts % limit != 0) defaultPage + 1;
-    
-    
+    if (countProducts % limit != 0) defaultPage + 1;
+
     return defaultPage;
+}
+
+export const addOrder = async (data: Order) => {
+    const order = await prisma.order.create({ data });
+    return order;
 }
