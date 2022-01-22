@@ -50,3 +50,23 @@ export const userGetEnterprise = async (id: number) => {
 
     return enterprise;
 }
+
+export const getOrders = async (id: number) => {
+    const orders = await prisma.order.findMany({ 
+        where: { userId: id },
+        select: {
+            id: true,
+            product: {
+                select: {
+                    id: true,
+                    name: true,
+                    images: true,
+                    stock: true,
+                    price: true
+                }
+            }
+        } 
+    });
+
+    return orders;
+}

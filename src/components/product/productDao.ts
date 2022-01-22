@@ -106,3 +106,16 @@ export const addOrder = async (data: Order) => {
     const order = await prisma.order.create({ data });
     return order;
 }
+
+export const getOrder = async (data: Order) => {
+    const order = await prisma.order.findFirst({ where: {
+        productId: data.productId,
+        userId: data.userId
+    }});
+    return order;
+}
+
+export const deleteOrder = async (id: number) => {
+    const order = await prisma.order.delete({ where: { id } });
+    return order;
+}

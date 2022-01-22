@@ -2,7 +2,7 @@ import { PrismaClient, User } from "@prisma/client"
 import { Request } from "express";
 import { hashPass } from "../../services/auth/password";
 import { deleteFile, uploadManyFiles } from "../../services/images/Cloudinary"
-import { IUserJwt } from "./userStructure";
+import { IOrdersByUser, IUserJwt, OrdersByUser } from "./userStructure";
 const prisma = new PrismaClient();
 
 export const updateUser = async (user: User, id: number, file?: Express.Multer.File) => {
@@ -87,4 +87,20 @@ export const storeAndDeleteImage = async (userReq: User, file?: Express.Multer.F
         userReq.profileKey = key;
     }
     return userReq;
+}
+
+
+export const formatOrdersByUser = (ordersByUser: OrdersByUser[]) => {
+    return ordersByUser.map(orderByUser => {
+        const { id } = orderByUser;
+        const { id: productId, name, stock, price, images } = orderByUser.product!;
+        return {
+            id,
+            productId,
+            name,
+            stock,
+            price,
+            images
+        }
+    }) as IOrdersByUser[]
 }

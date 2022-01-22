@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { IResult, result } from "../../response/default";
 import { auth } from "../../services/auth/login";
 import { registerV2 } from "../../services/auth/register";
-import { formatUserUpdate } from "./userMethods";
-import { allUsers, userById, userHasEnterprise, updateUser, userGetEnterprise } from './userDao';
+import { formatOrdersByUser, formatUserUpdate } from "./userMethods";
+import { allUsers, userById, userHasEnterprise, updateUser, userGetEnterprise, getOrders } from './userDao';
 import { getId } from "../../helpers/reqRes";
 
 export const all = async (req: Request, res: Response): Promise<Response<IResult>> => {
@@ -74,6 +74,17 @@ export const getEnterprise = async (req: Request, res: Response): Promise<Respon
     const enterprise = await userGetEnterprise(id);
 
     return result(res, enterprise);
+  } catch (error: any) {
+    return result(res, error.toString(), false);
+  }
+}
+
+export const orders = async (req: Request, res: Response): Promise<Response<IResult>> => {
+  try {
+    const id = getId(req, 'id');
+    const orders = await getOrders(id);
+    const formatOrders = formatOrdersByUser(orders);
+    return result(res, formatOrders);
   } catch (error: any) {
     return result(res, error.toString(), false);
   }
