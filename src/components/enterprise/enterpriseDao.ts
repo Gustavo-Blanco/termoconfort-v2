@@ -99,33 +99,26 @@ export const getPagination = async (limit: number = 9) => {
 export const getInteresteds = async (enterpriseId: number) => {
     const products = await prisma.product.findMany({
         where: { enterpriseId },
-        select: { id: true }
-    });
-
-    const productIds = products.map(product => product.id);
-
-    const orders = await prisma.order.findMany({
-        where: { productId: { in: productIds } },
         select: {
             id: true,
-            product: {
+            name: true,
+            description: true,
+            stock: true,
+            price: true,
+            orders: {
                 select: {
-                    id: true,
-                    name: true,
-                    stock: true,
-                    price: true
-                }
-            },
-            user: {
-                select: {
-                    id: true,
-                    email: true,
-                    name: true
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            phoneNumber: true
+                        }
+                    }
                 }
             }
-        },
-        
+        }
     });
 
-    return orders;
+    return products;
 }

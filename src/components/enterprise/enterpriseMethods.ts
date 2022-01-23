@@ -1,8 +1,8 @@
-import { Enterprise } from "@prisma/client";
+import { Enterprise, Order } from "@prisma/client";
 import { toStringIfNumber } from "../../helpers/requestForm";
 import { deleteFile, uploadManyFiles } from "../../services/images/Cloudinary";
 import { getPagination } from './enterpriseDao';
-import { IEntepriseSearchPage, IInterested, OrdersUserProduct } from './enterpriseStructure';
+import { IEntepriseSearchPage, IInterested, IInterestedV2, IProductInterested, OrdersUserProduct, ProductsWithInteresteds } from './enterpriseStructure';
 
 export const imageEnterprise = async (enterprise: Enterprise, file?: Express.Multer.File): Promise<Enterprise> => {
     const { imageKey } = enterprise;
@@ -84,6 +84,21 @@ export const formatResInteresteds = (interesteds: OrdersUserProduct[]) => {
         }
 
     }) as IInterested[];
+
+    return data;
+}
+
+export const formatResInterestedsV2 = (interesteds: ProductsWithInteresteds[]) => {
+    const data = interesteds.map(interested => {
+        const { id, name, description, stock, price } = interested;
+        
+        const users = interested.orders.map(order => {
+            const { id, name, email, phoneNumber } = order.user!;
+            return { id, name, email, phoneNumber }
+        }) as IInterestedV2[];
+
+        return { id, name, description, stock, price, users }
+    }) as IProductInterested[];
 
     return data;
 }

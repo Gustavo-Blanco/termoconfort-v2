@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { getId, getPaginateParams } from "../../helpers/reqRes";
 import { IResult, result } from "../../response/default";
 import { allEnterprises, deactivateEnterprise, enterpriseByUser, getEnterpriseById, saveEnterprise, updateEnterprise, updateStateEnterprise, searchEnterprises, getPagination, getInteresteds } from "./enterpriseDao";
-import { formatPagination, formatResInteresteds } from './enterpriseMethods';
+import { formatPagination, formatResInteresteds, formatResInterestedsV2 } from './enterpriseMethods';
 
 export const all = async (req: Request, res: Response): Promise<Response<IResult>> => {
     try {
@@ -91,8 +91,8 @@ export const interesteds = async (req: Request, res: Response): Promise<Response
     try {
         const id = getId(req, 'id');
         const orders = await getInteresteds(id);
-        
-        const interesteds = formatResInteresteds(orders);
+        // return result(res, orders);
+        const interesteds = formatResInterestedsV2(orders);
         return result(res, interesteds);
     } catch (error: any) {
         return result(res, error.toString(), false);
