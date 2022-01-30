@@ -14,6 +14,6 @@ router.route('/has-enterprise/:id').get(authorization,hasEnterprise);
 router.route('/update/:id').put(authorization,uploadMulter.single('image'),update);
 router.route('/get-enterprise/:id').get(getEnterprise);
 router.route('/get-orders/:id').get(orders);
-router.route('/search').get(search);
+router.route('/search').post(search);
 
 export default router;
