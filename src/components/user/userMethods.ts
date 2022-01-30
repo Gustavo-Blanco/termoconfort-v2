@@ -2,7 +2,8 @@ import { PrismaClient, User } from "@prisma/client"
 import { Request } from "express";
 import { hashPass } from "../../services/auth/password";
 import { deleteFile, uploadManyFiles } from "../../services/images/Cloudinary"
-import { IOrdersByUser, IUserJwt, OrdersByUser } from "./userStructure";
+import { getPagination } from './userDao';
+import { IOrdersByUser, IUserJwt, IUserSearchPage, OrdersByUser } from "./userStructure";
 const prisma = new PrismaClient();
 
 export const updateUser = async (user: User, id: number, file?: Express.Multer.File) => {
@@ -103,4 +104,12 @@ export const formatOrdersByUser = (ordersByUser: OrdersByUser[]) => {
             images
         }
     }) as IOrdersByUser[]
+}
+
+export const formatPagination = async (userReq: User, users: User[], limit: number) => {
+    const pages = await getPagination(userReq, limit);
+    return {
+        users,
+        pages
+    } as IUserSearchPage
 }

@@ -1,4 +1,4 @@
-import { Image, Prisma } from '@prisma/client';
+import { Image, Prisma, User } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime';
 
 export interface IUserJwt {
@@ -31,4 +31,9 @@ export interface IOrdersByUser {
     images: Image[];
     stock: number;
     price: Decimal;
+}
+
+export interface IUserSearchPage {
+    users: User[],
+    pages: number;
 }

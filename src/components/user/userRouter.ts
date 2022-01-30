@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import { authorization } from '../../middlewares/authorization';
 import { uploadMulter } from '../../services/images/Multer';
-import { all, signUp, signIn, byId, hasEnterprise, update, getEnterprise, orders } from './userController';
+import { all, signUp, signIn, byId, hasEnterprise, update, getEnterprise, orders, search } from './userController';
 
 const router: Router = Router();
 
@@ -14,5 +14,6 @@ router.route('/has-enterprise/:id').get(authorization,hasEnterprise);
 router.route('/update/:id').put(authorization,uploadMulter.single('image'),update);
 router.route('/get-enterprise/:id').get(getEnterprise);
 router.route('/get-orders/:id').get(orders);
+router.route('/search').get(search);
 
 export default router;

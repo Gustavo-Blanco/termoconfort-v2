@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { IResult, result } from "../../response/default";
 import { auth } from "../../services/auth/login";
 import { registerV2 } from "../../services/auth/register";
-import { formatOrdersByUser, formatUserUpdate } from "./userMethods";
-import { allUsers, userById, userHasEnterprise, updateUser, userGetEnterprise, getOrders } from './userDao';
-import { getId } from "../../helpers/reqRes";
+import { formatOrdersByUser, formatPagination, formatUserUpdate } from "./userMethods";
+import { allUsers, userById, userHasEnterprise, updateUser, userGetEnterprise, getOrders, searchUsers } from './userDao';
+import { getId, getPaginateParams } from "../../helpers/reqRes";
 
 export const all = async (req: Request, res: Response): Promise<Response<IResult>> => {
   try {
@@ -85,6 +85,18 @@ export const orders = async (req: Request, res: Response): Promise<Response<IRes
     const orders = await getOrders(id);
     const formatOrders = formatOrdersByUser(orders);
     return result(res, formatOrders);
+  } catch (error: any) {
+    return result(res, error.toString(), false);
+  }
+}
+
+export const search = async (req: Request, res: Response): Promise<Response<IResult>> => {
+  try {
+    const { page, limit } = getPaginateParams(req);
+
+    const users = await searchUsers(req.body, limit, page);
+    const data = await formatPagination(req.body, users, limit);
+    return result(res, data);
   } catch (error: any) {
     return result(res, error.toString(), false);
   }

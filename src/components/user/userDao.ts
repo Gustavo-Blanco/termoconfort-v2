@@ -1,4 +1,5 @@
 import { PrismaClient, User } from "@prisma/client";
+import { paginate } from '../../helpers/pagination';
 import { errorDefault } from "../../response/default";
 import { hashPass } from "../../services/auth/password";
 import { registerV2 } from "../../services/auth/register";
@@ -69,4 +70,39 @@ export const getOrders = async (id: number) => {
     });
 
     return orders;
+}
+
+export const searchUsers = async (userReq: User, limit: number = 10, page: number = 0) => {
+    const { skip, take } = paginate(limit, page);
+
+    const users = await prisma.user.findMany({ 
+        where: {
+            ...userReq,
+            name: {
+                contains: userReq.name || ''
+            }
+        },
+        skip,
+        take
+    });
+
+    return users;
+}
+
+export const getPagination = async (userReq: User, limit: number = 9) => {
+    const countUsers = await prisma.user.count({
+        where: {
+            ...userReq,
+            name: {
+                contains: userReq.name || ''
+            }
+        }
+    });
+    if (countUsers <= limit) return 0;
+
+    let defaultPage = Math.floor(countUsers / limit);
+
+    if (countUsers % limit != 0) defaultPage + 1;
+
+    return defaultPage;
 }
