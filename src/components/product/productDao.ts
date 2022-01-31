@@ -29,7 +29,7 @@ export const storeProduct = async (body: any, files?: Express.Multer.File[]) => 
 export const updateProduct = async (body: any, id: number, files?: Express.Multer.File[]) => {
     const productReq = formatProduct(body);
     let imagesToInsert = await saveImagesCloud(productReq, files);
-
+    
     const product = await prisma.product.update({
         where: { id: id },
         data: {

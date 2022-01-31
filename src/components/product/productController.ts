@@ -33,6 +33,8 @@ export const update = async (req: Request, res: Response): Promise<Response<IRes
     try {
         const id = getId(req, 'id');
         const files = req.files as Express.Multer.File[];
+        console.log(files);
+        
         const product = await updateProduct(req.body, id, files);
 
         return result(res, product);

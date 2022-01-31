@@ -93,13 +93,14 @@ export const deleteImagesV2 = async (imagesModel: Image[]) => {
 
 export const saveImagesCloud = async (productReq:Product, files?: Express.Multer.File[]) => {
     if (files) {
-        
-        const imagesModel = await imagesByProduct(productReq.id);
-        console.log(productReq, imagesModel, 'MIS LOGS productMethods.ts line 98');
-        await deleteImagesV2(imagesModel);
-
-        const imagesToInsert = await saveImages(productReq, files);
-        return imagesToInsert;
+        if (files.length > 0) {
+            const imagesModel = await imagesByProduct(productReq.id);
+            console.log(productReq, imagesModel, 'MIS LOGS productMethods.ts line 98');
+            await deleteImagesV2(imagesModel);
+    
+            const imagesToInsert = await saveImages(productReq, files);
+            return imagesToInsert;
+        }
     }
     return [] as Image[];
 }
