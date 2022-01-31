@@ -46,6 +46,7 @@ export const searchProducts = async (product: Product, limit: number = 10, page:
 
 export const formatProduct = (body: Product) => {
     const {
+        id,
         enterpriseId,
         name,
         description,
@@ -61,6 +62,7 @@ export const formatProduct = (body: Product) => {
     } = body;
 
     const product = {
+        id: toStringIfNumber(id),
         enterpriseId: toStringIfNumber(enterpriseId),
         name,
         description,
